@@ -1,0 +1,69 @@
+﻿shot_direction,general_direction,start_angle,end_angle,distance,batting_style
+Short Third man,third man,5,35,half,right_handed
+Slips,third man,5,35,,right_handed
+Third-man,third man,5,35,full,right_handed
+Backward-point,point,35,81.33344053,half,right_handed
+Point,point,35,81.33344053,half,right_handed
+Deep Backward-point,point,35,81.33344053,full,right_handed
+Deep Point,point,35,81.33344053,full,right_handed
+Cover-point,covers,81.33344053,135,half,right_handed
+Covers,covers,81.33344053,135,half,right_handed
+Extra-covers,covers,81.33344053,135,half,right_handed
+Deep Cover-point,covers,81.33344053,135,full,right_handed
+Deep Cover,covers,81.33344053,135,full,right_handed
+Deep Extra-cover,covers,81.33344053,135,full,right_handed
+Mid-off,mid off,135,175,half,right_handed
+Long-off,mid off,135,175,full,right_handed
+On the Pitch,straight,175,185,pitch,right_handed
+Straight,straight,175,185,full,right_handed
+To the Bowler,straight,175,185,pitch,right_handed
+Non-Striker Stumps,straight,175,185,pitch,right_handed
+Mid-on,mid on,185,225,half,right_handed
+Long-on,mid on,185,225,full,right_handed
+Cow corner,mid wicket,225,278.6665595,full,right_handed
+Mid-wicket,mid wicket,225,278.6665595,half,right_handed
+Deep Mid-wicket,mid wicket,225,278.6665595,full,right_handed
+Square leg,square leg,278.6665595,315,half,right_handed
+Backward square leg,square leg,278.6665595,315,half,right_handed
+Deep Square leg,square leg,278.6665595,315,full,right_handed
+Deep Backward square leg,square leg,278.6665595,315,full,right_handed
+Long leg,fine leg,315,355,full,right_handed
+Short Fine leg,fine leg,315,355,half,right_handed
+Deep Long leg,fine leg,315,355,full,right_handed
+Fine leg,fine leg,315,355,full,right_handed
+Keeper Take,keeper,355,5,,right_handed
+Behind Keeper,keeper,355,5,full,right_handed
+Short Third man,third man,315,355,half,left_handed
+Slips,third man,315,355,,left_handed
+Third-man,third man,315,355,full,left_handed
+Backward-point,point,278.6665595,315,half,left_handed
+Point,point,278.6665595,315,half,left_handed
+Deep Backward-point,point,278.6665595,315,full,left_handed
+Deep Point,point,278.6665595,315,full,left_handed
+Cover-point,covers,225,278.6665595,half,left_handed
+Covers,covers,225,278.6665595,half,left_handed
+Extra-covers,covers,225,278.6665595,half,left_handed
+Deep Cover-point,covers,225,278.6665595,full,left_handed
+Deep Cover,covers,225,278.6665595,full,left_handed
+Deep Extra-cover,covers,225,278.6665595,full,left_handed
+Mid-off,mid off,185,225,half,left_handed
+Long-off,mid off,185,225,full,left_handed
+On the Pitch,straight,175,185,pitch,left_handed
+Straight,straight,175,185,full,left_handed
+To the Bowler,straight,175,185,pitch,left_handed
+Non-Striker Stumps,straight,175,185,pitch,left_handed
+Mid-on,mid on,135,175,half,left_handed
+Long-on,mid on,135,175,full,left_handed
+Cow corner,mid wicket,81.33344053,135,full,left_handed
+Mid-wicket,mid wicket,81.33344053,135,half,left_handed
+Deep Mid-wicket,mid wicket,81.33344053,135,full,left_handed
+Square leg,square leg,35,81.33344053,half,left_handed
+Backward square leg,square leg,35,81.33344053,half,left_handed
+Deep Square leg,square leg,35,81.33344053,full,left_handed
+Deep Backward square leg,square leg,35,81.33344053,full,left_handed
+Long leg,fine leg,5,35,full,left_handed
+Short Fine leg,fine leg,5,35,half,left_handed
+Deep Long leg,fine leg,5,35,full,left_handed
+Fine leg,fine leg,5,35,full,left_handed
+Keeper Take,keeper,355,5,,left_handed
+Behind Keeper,keeper,355,5,full,left_handed
