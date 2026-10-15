@@ -1,0 +1,19 @@
+[project]
+name = "data-premier-league"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "great-tables>=0.23.0",
+    "lightgbm>=4.6.0",
+    "matplotlib>=3.10.9",
+    "openpyxl>=3.1.5",
+    "plotly>=6.7.0",
+    "scikit-learn>=1.7.2",
+    "seaborn>=0.13.2",
+    "st-clickable-images>=0.0.3",
+    "streamlit>=1.58.0",
+    "streamlit-extras>=1.6.0",
+    "streamlit-image-select>=0.6.0",
+]
