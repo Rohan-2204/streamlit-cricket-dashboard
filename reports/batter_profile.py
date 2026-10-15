@@ -5,6 +5,7 @@ from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_extras.great_tables import  great_tables
 from great_tables import GT
 from utils.utils import *
+from streamlit_extras.resizable_columns import resizable_columns
 
 st.set_page_config(
     "Batsman Profile",
@@ -145,7 +146,7 @@ with st.sidebar:
 
 
 
-cols = st.columns([1,1])
+cols = resizable_columns([1,1])
 
 with cols[0]:
 
@@ -206,7 +207,7 @@ kpis_df = pd.DataFrame({
 n_cols = int(np.floor(len(kpis_df)//2))
 for start in range(0, len(kpis_df), n_cols):
 
-    cols = st.columns(n_cols)
+    cols = resizable_columns(n_cols)
 
     for col, (_, row) in zip(cols, kpis_df.iloc[start:start+n_cols].iterrows()):
         with col:
@@ -257,7 +258,7 @@ metric_cols = [
 
 with st.expander("Ball Speed and Release Height", expanded=False):
 
-    col1, col2 = st.columns(2, gap="medium")
+    col1, col2 = resizable_columns(2, gap="medium")
 
     with col1:
         table1 = (
@@ -338,7 +339,7 @@ heatmap_metrics_df = pd.DataFrame({
 })
 
 
-cols_ht = st.columns([4,1])
+cols_ht = resizable_columns([4,1])
 with cols_ht[1]:
 
     metric_selector = st.radio(
@@ -387,7 +388,7 @@ st.markdown(
     unsafe_allow_html=True
 )
         
-filter_col1, filter_col2, filter_col3, filter_col4 = st.columns(4)
+filter_col1, filter_col2, filter_col3, filter_col4 = resizable_columns(4)
 
 with filter_col1:
     available_lines = list(team_batting_df_bbb['line'].dropna().unique())

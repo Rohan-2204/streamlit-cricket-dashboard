@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
-
+from streamlit_extras.resizable_columns import resizable_columns
 from streamlit_extras.metric_cards import style_metric_cards
 
 from utils.utils import *
@@ -160,7 +160,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
                 team_color_df['team_name'] == chosen_team, 'secondary_color' # type: ignore
             ].reset_index(drop = True).iloc[0]
         
-        cols0 = st.columns(len(batsman_stats_kpis))
+        cols0 = resizable_columns(len(batsman_stats_kpis))
 
 
         temp_overall_df = overall_batsman_stats_df.loc[
@@ -257,7 +257,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
         })
 
 
-        cols = st.columns(
+        cols = resizable_columns(
             len(batting_kpis_delta), 
             # gap = 'xxlarge'
         )
@@ -325,7 +325,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
             # border = True,
             key = 'partnerships'
         ):
-            col1, col2 = st.columns(2)
+            col1, col2 = resizable_columns(2)
             with col1:
                 st.plotly_chart(
                     plot_partnership_runs(
@@ -361,7 +361,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
             # border = True,
             key = 'run-rates'
         ):
-            coll1,coll2 = st.columns(2)
+            coll1,coll2 = resizable_columns(2)
             
             with coll1:
                 st.plotly_chart(
@@ -478,7 +478,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
             (overall_bowler_stats_df['balls'] >= 100)
         ].reset_index(drop = True)
 
-        cols1 = st.columns(len(bowling_stat_kpis_df))
+        cols1 = resizable_columns(len(bowling_stat_kpis_df))
         for i, row in bowling_stat_kpis_df.iterrows():
 
             with cols1[i]: # type: ignore
@@ -547,7 +547,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
             'delta_value' : ['normal', 'normal', 'inverse', 'inverse']
         })
 
-        cols_bow = st.columns(len(bowling_kpis_delta))
+        cols_bow = resizable_columns(len(bowling_kpis_delta))
 
         
         team_bowling_df = get_bowling_profile(
@@ -590,7 +590,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
 
         st.subheader(f'Overwise False Shot % Induced by {chosen_team} (Number to Right of bars - Wickets Taken)')
 
-        col1, col2 = st.columns(2)
+        col1, col2 = resizable_columns(2)
         with col1:
 
             st.plotly_chart(
@@ -625,7 +625,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
 
 
     ############# 2 separate functions for false shot induced & Bowling metrics per over. Start from here
-        _,_,_col3 = st.columns([2,2,1])
+        _,_,_col3 = resizable_columns([2,2,1])
         with _col3:
             metric = st.selectbox(
                 'Select Bowling Metric',
@@ -640,7 +640,7 @@ if chosen_team is not None and chosen_team in master_df['team_bat'].unique():
                 key = 'bowling_metric_selectbox'
             )
 
-        col1, col2 = st.columns(2)
+        col1, col2 = resizable_columns(2)
         with col1:
 
             st.plotly_chart(

@@ -136,7 +136,6 @@ if st.session_state.home_page:
     with st.container(border = True):
 
         st.success("Select your team to make the decisions for. \n The dashboard will choose this as your team and provide analysis accordingly. \n You can change your team in the Team analysis Page.")
-
         mapping_name = auto_map_and_rename_logos()
 
         assert mapping_name is not None
