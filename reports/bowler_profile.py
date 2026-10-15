@@ -149,7 +149,10 @@ with st.sidebar:
         key='bowler_innings_choice'
     )
 
-cols = resizable_columns([1, 1])
+cols = resizable_columns(
+    [1, 1],
+    key = 'resized_col1'
+)
 
 with cols[0]:
     phase_select = st.multiselect(
@@ -215,7 +218,10 @@ n_cols = int(np.floor(len(bowler_kpi_map)//2))
 
 
 for start in range(0, len(bowler_kpi_map), n_cols):
-    metric_cols = resizable_columns(n_cols)
+    metric_cols = resizable_columns(
+        n_cols,
+        key = f'resized_col{100-start}'
+    )
     for col, (_, row) in zip(metric_cols, bowler_kpi_map.iloc[start:start+n_cols].iterrows()):
         with col:          
             st.metric(
@@ -257,7 +263,10 @@ metric_cols = [
 
 with st.expander("Ball Speed and Release Height", expanded=False):
 
-    col1, col2 = resizable_columns(2, gap="medium")
+    col1, col2 = resizable_columns(
+        2, 
+        key = 'resized_col3'
+    )
 
     with col1:
         table1 = (
@@ -337,7 +346,10 @@ heatmap_metrics_df = pd.DataFrame({
     ]
 })
 
-cols_ht = resizable_columns([4,1])
+cols_ht = resizable_columns(
+    [4,1],
+    key = 'resized_col7'
+)
 with cols_ht[1]:
 
     metric_selector = st.radio(
@@ -385,7 +397,10 @@ st.markdown(
 )
 
         
-filter_col1, filter_col2, filter_col3, filter_col4 = resizable_columns(4)
+filter_col1, filter_col2, filter_col3, filter_col4 = resizable_columns(
+                                                        4,
+                                                        key = 'resized_col8'
+                                                    )
 
 with filter_col1:
     available_lines = list(team_bowling_df_bbb['line'].dropna().unique())
