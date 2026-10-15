@@ -3,13 +3,7 @@ import pandas as pd
 import numpy as np
 from streamlit_extras.metric_cards import style_metric_cards
 from streamlit_extras.great_tables import  great_tables
-
-
 from great_tables import GT
-
-
-from model.tactical_model import *
-
 from utils.utils import *
 
 st.set_page_config(
