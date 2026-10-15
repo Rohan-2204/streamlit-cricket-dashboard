@@ -22,9 +22,7 @@ if 'show_bowler_predictive_analysis' not in st.session_state:
 
 # --- 1. Session State Initialization ---
 master_df = st.session_state.master_df.copy()
-pitch_coord_df = st.session_state.pitch_coord_df.copy()
 selected_team = st.session_state.get("selected_team")
-model_params = st.session_state.model_params
 bowling_type_map = st.session_state.bowling_type_map
 ground_angles_df = st.session_state.ground_angles_df.copy()
 team_color_df = st.session_state.get('team_color_df')

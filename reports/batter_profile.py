@@ -15,11 +15,9 @@ st.set_page_config(
 
 
 master_df = st.session_state.master_df.copy()
-pitch_coord_df = st.session_state.pitch_coord_df.copy()
 ground_angles_df = st.session_state.ground_angles_df.copy()
 selected_team = st.session_state.get("selected_team")
 bowling_type_map = st.session_state.bowling_type_map
-model_params = st.session_state.model_params
 team_color_df = st.session_state.get('team_color_df')
 pace_cat_dict = st.session_state.get('pace_cat_dict')
 release_ht_dict = st.session_state.get('release_ht_dict')
