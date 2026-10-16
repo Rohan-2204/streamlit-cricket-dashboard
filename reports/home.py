@@ -162,7 +162,7 @@ if st.session_state.home_page:
 
 else:
 
-    st.info("Please refresh the page. If it doesn't work, please restart the app from the terminal")
+    st.error("Please refresh the page.")
 
 
 

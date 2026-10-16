@@ -34,7 +34,7 @@ def build_points_table(
 ):
 
     df = master_df.copy()
-    unq_seasons = list(df['season'].unique())
+    unq_seasons = list(df['year'].unique())
     season_selector = st.selectbox(
         "Select Season",
         options = unq_seasons,
