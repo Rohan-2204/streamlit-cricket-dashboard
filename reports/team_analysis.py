@@ -72,12 +72,6 @@ def build_points_table(
         key="pts_table"
     )
 
-    
-    st.dataframe(
-,
-        width= 'stretch',
-        key = 'pts_table'
-    )
 
     if st.button(
         "Close",
