@@ -35,6 +35,7 @@ if 'initialized' not in st.session_state:
     st.session_state.update({
         'initialized' : True,
         "master_df" : master_df.copy(),
+        "get_points_table" : False,
         "home_page" : True,
         'selected_team' : None,
         'season' : None,
