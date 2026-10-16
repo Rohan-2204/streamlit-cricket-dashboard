@@ -151,6 +151,94 @@ def get_bowling_styles_by_team(df: pd.DataFrame, team_name: str) -> list:
     ].dropna().unique().tolist()
 
 
+def get_points_table(master_df):
+    df = master_df.copy()
+
+    innings = (
+        df.groupby(['year', 'p_match', 'inns', 'team_bat', 'team_bowl'])
+        .agg(
+            runs=('score', 'sum'),
+            balls=('inns_balls', 'max'),
+            wickets=('out', 'sum'),
+            max_balls=('max_balls', 'max')
+        )
+        .reset_index()
+    )
+
+    innings['balls'] = innings['balls'].where(
+        innings['wickets'] < 10, innings['max_balls']
+    )
+
+    matches = (
+        df.groupby(['year', 'p_match'])
+        .agg(
+            team1=('team_bat', 'first'),
+            team2=('team_bowl', 'first'),
+            winner=('winner', 'first')
+        )
+        .reset_index()
+    )
+
+    teams = pd.concat([
+        matches.rename(columns={'team1': 'team'})[['year', 'p_match', 'team', 'winner']],
+        matches.rename(columns={'team2': 'team'})[['year', 'p_match', 'team', 'winner']]
+    ], ignore_index=True)
+
+    teams['wins'] = (teams['team'] == teams['winner']).astype(int)
+    teams['NR'] = teams['winner'].isna() | teams['winner'].eq('-')
+    teams['losses'] = (
+        (teams['wins'] == 0) & ~teams['NR']
+    ).astype(int)
+
+    table = (
+        teams.groupby(['year', 'team'])
+        .agg(
+            wins=('wins', 'sum'),
+            losses=('losses', 'sum'),
+            NR=('NR', 'sum')
+        )
+        .reset_index()
+    )
+
+    batting = innings.groupby(['year', 'team_bat']).agg(
+        runs_for=('runs', 'sum'),
+        balls_faced=('balls', 'sum')
+    )
+
+    bowling = innings.groupby(['year', 'team_bowl']).agg(
+        runs_against=('runs', 'sum'),
+        balls_bowled=('balls', 'sum')
+    )
+
+    table = (
+        table
+        .merge(batting, left_on=['year', 'team'], right_index=True)
+        .merge(bowling, left_on=['year', 'team'], right_index=True)
+    )
+
+    table['points'] = 2 * table['wins'] + table['NR']
+
+    table['NRR'] = (
+        6 * table['runs_for'] / table['balls_faced']
+        - 6 * table['runs_against'] / table['balls_bowled']
+    ).round(3)
+
+    table = table.sort_values(
+        ['year', 'points', 'NRR'],
+        ascending=[True, False, False]
+    )
+
+    table['position'] = table.groupby('year').cumcount() + 1
+
+    return (
+        table.rename(columns={'year': 'season'})
+        [['season', 'position', 'team',  'wins', 'losses', 'NR', 'NRR']]
+        .reset_index(drop=True)
+    )
+
+
+
+
 
 def get_body_weight_metrics(df,group_cols):
 
