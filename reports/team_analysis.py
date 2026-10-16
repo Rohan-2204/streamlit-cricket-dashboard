@@ -30,7 +30,9 @@ def load_css(css_file: str = "main.css"):
 @st.dialog("IPL Points Table",width = 'medium')
 def build_points_table(
     master_df,
-    season
+    season,
+    selected_team,
+    secondary_color
 ):
 
     df = master_df.copy()
@@ -44,10 +46,35 @@ def build_points_table(
 
     points_table = get_points_table(df)
 
-    st.dataframe(
-        points_table.loc[
+    points_table = points_table.loc[
             points_table['Season'].isin([season_selector])
-        ].reset_index(drop =True),
+        ].reset_index(drop =True)
+    
+    def highlight_team(row):
+        if row['team'] == selected_team:
+            return [
+                f"background-color: {secondary_color}33"
+            ] * len(row)
+
+        return [""] * len(row)
+
+    styled_table = points_table.style.apply(
+                        highlight_team,
+                        axis=1
+                    ).format({
+                        "Net-Run-Rate": "{:+.3f}"
+                    })
+
+    st.dataframe(
+        styled_table,
+        width="stretch",
+        hide_index=True,
+        key="pts_table"
+    )
+
+    
+    st.dataframe(
+,
         width= 'stretch',
         key = 'pts_table'
     )
@@ -175,6 +202,15 @@ all_team_speed_cat_bowling_df = get_bowling_profile(
     ['year', 'phase', 'bowl_kind', 'bowl_speed_category', 'bowl_release_point']
 )
 
+assert team_color_df is not None
+primary_color = team_color_df.loc[
+        team_color_df['team_name'] == chosen_team, 'primary_color' # type: ignore
+    ].reset_index(drop = True).iloc[0]
+
+secondary_color = team_color_df.loc[
+        team_color_df['team_name'] == chosen_team, 'secondary_color' # type: ignore
+    ].reset_index(drop = True).iloc[0]
+
 ### KPIs
 
 # Batting KPIs : balls per boundary, dismissal rate, dot %, run rate, batsman avg strike rate
@@ -183,7 +219,9 @@ if st.session_state.get_points_table:
 
     build_points_table(
         master_df,
-        season=season
+        season=season,
+        selected_team=selected_team,
+        secondary_color=secondary_color
     )
 
 else:
@@ -202,15 +240,6 @@ else:
                 # 'delta_value' : ['normal', 'normal', 'normal', 'normal']
             })
 
-            assert team_color_df is not None
-            primary_color = team_color_df.loc[
-                    team_color_df['team_name'] == chosen_team, 'primary_color' # type: ignore
-                ].reset_index(drop = True).iloc[0]
-
-            secondary_color = team_color_df.loc[
-                    team_color_df['team_name'] == chosen_team, 'secondary_color' # type: ignore
-                ].reset_index(drop = True).iloc[0]
-            
             cols0 = resizable_columns(
                 len(batsman_stats_kpis),
                 key = 'resized_col1'
