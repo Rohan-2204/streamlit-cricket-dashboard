@@ -1069,7 +1069,7 @@ def plot_single_metric_heatmap(
     )
 
     fig.update_layout(
-        title=title_text or f"{metric_title} by Pitch Line & Length",
+        # title=title_text or f"{metric_title} by Pitch Line & Length",
         xaxis_title="Pitch Line",
         yaxis_title="Pitch Length",
         template="plotly_white",
