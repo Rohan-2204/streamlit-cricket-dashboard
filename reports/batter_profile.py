@@ -366,7 +366,7 @@ with cols_ht[0]:
         f"""
         <div style="text-align: center;
         font-size : 28px;">
-            <strong> Batter Metrics Heatmaps: {metric_selector}  </strong>
+            <strong> Batter Metrics Heatmaps (Balls in area in brackets): {metric_selector}  </strong>
         </div>
         """,
         unsafe_allow_html=True

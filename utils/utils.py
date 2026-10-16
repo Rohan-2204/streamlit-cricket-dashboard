@@ -17,7 +17,6 @@ import plotly.express as px
 
 def slugify(text: str) -> str:
     """Normalizes string by removing spaces and special characters for comparison."""
-    
     return re.sub(r"[^a-z0-9]", "", text.lower())
 
 
@@ -25,16 +24,15 @@ def auto_map_and_rename_logos(
     logos_dir_path: str = "assets/logos", 
     data_path: str = "data/raw/master_df.csv"
 ):
+    """Automatically maps and renames logo files to match team names in the dataset."""
     logos_dir = Path(logos_dir_path)
 
     if not logos_dir.exists():
         print(f"Error: Directory '{logos_dir}' does not exist.")
         return
 
-    # 1. Extract unique team names from dataset
     if Path(data_path).exists():
         df = pd.read_csv(data_path)
-        # Combine team_bat and team_bowl to ensure all teams are captured
         teams = sorted(
             list(
                 set(
@@ -63,7 +61,6 @@ def auto_map_and_rename_logos(
 
     print(f"Found {len(teams)} unique teams in dataset.")
 
-    # 2. Iterate through files in assets/logos
     logo_files = list(logos_dir.glob("*.[pP][nN][gG]")) + list(
         logos_dir.glob("*.[jJ][pP][gG]")
     )
@@ -82,14 +79,11 @@ def auto_map_and_rename_logos(
         best_match = None
         highest_score = 0.0
 
-        # Match file stem against each dataset team name
         for team in teams:
             team_slug = slugify(team)
 
-        # Calculate similarity ratio
             ratio = difflib.SequenceMatcher(None, clean_stem, team_slug).ratio()
 
-            # Boost score if abbreviation/substring match exists (e.g., 'csk' in 'chennaisuperkings')
             if clean_stem in team_slug or team_slug in clean_stem:
                 ratio += 0.5
 
@@ -98,15 +92,12 @@ def auto_map_and_rename_logos(
                 best_match = team
 
         if best_match:
-        # Construct new filename using exact dataset team name
-            safe_team_name = re.sub(r'[\\/*?:"<>|]', "", best_match)  # sanitize
+            safe_team_name = re.sub(r'[\\/*?:"<>|]', "", best_match)
             new_filename = f"{safe_team_name}{file_path.suffix}"
             new_path = logos_dir / new_filename
 
-
             mapping[original_name] = safe_team_name
 
-            # Rename file on disk
             if file_path.resolve() != new_path.resolve():
                 file_path.rename(new_path)
 
@@ -114,6 +105,7 @@ def auto_map_and_rename_logos(
 
 
 def lighten_color(hex_color, amount):
+    """Lightens a given hex color by a specified amount."""
     hex_color = hex_color.lstrip("#")
     r = int(hex_color[0:2], 16)
     g = int(hex_color[2:4], 16)
@@ -132,17 +124,20 @@ def get_unique_teams(df: pd.DataFrame, exclude_team: str) -> list:
         if team != exclude_team
     ]
 
+
 def get_batsmen_by_team(df: pd.DataFrame, team_name: str) -> list:
     """Retrieves unique batsmen for a given team."""
     return df.loc[
         df["team_bat"] == team_name, "striker"
     ].dropna().unique().tolist()
 
+
 def get_bowlers_by_team(df: pd.DataFrame, team_name: str) -> list:
     """Retrieves unique bowlers for a given team."""
     return df.loc[
         df["team_bowl"] == team_name, "bowler"
     ].dropna().unique().tolist()
+
 
 def get_bowling_styles_by_team(df: pd.DataFrame, team_name: str) -> list:
     """Retrieves unique bowling styles for a given team."""
@@ -152,6 +147,7 @@ def get_bowling_styles_by_team(df: pd.DataFrame, team_name: str) -> list:
 
 
 def get_points_table(master_df):
+    """Calculates and returns the points table for each season from match data."""
     df = master_df.copy()
 
     innings = (
@@ -247,11 +243,8 @@ def get_points_table(master_df):
     )
 
 
-
-
-
-def get_body_weight_metrics(df,group_cols):
-
+def get_body_weight_metrics(df, group_cols):
+    """Computes aggregated delivery metrics grouped by specified columns."""
     group_df = (
         df
         .groupby(group_cols)
@@ -262,7 +255,6 @@ def get_body_weight_metrics(df,group_cols):
             false_shots=('control', 'sum')
         )
         .reset_index()
-        
     )
 
     group_df['False Shot %'] = round(group_df['false_shots'] * 100 / group_df['number_of_balls'], 2)
@@ -283,6 +275,7 @@ def get_plain_pitch_stumps_markings_figure(
     fig_width = 100,
     pitch_color = "rgba(240, 230, 140, 0.2)"
 ):
+    """Generates a plain figure representing pitch markings and stumps layout."""
     df = pitch_coords.copy()
 
     pitch_edges = df[df['point_description'] == 'edge'].reset_index(drop = True)
@@ -342,6 +335,7 @@ def get_stumps_line_on_pitch(
     pitch_coords,
     stumps_lines_needed = ['off stump', 'leg stump'],
 ):
+    """Adds stumps lines to the pitch figure."""
     off_leg_line = pitch_coords[
         (pitch_coords['point_name'].isin(['off stump', 'leg stump']))
         &
@@ -369,6 +363,7 @@ def get_lines_lengths_on_pitch(
     y_coord = 'y_coord',
     color = ''
 ):
+    """Adds pitch lines and lengths markers to the figure."""
     df = pitch_coords.copy()
     grouped = df.groupby(grouping_cols)
 
@@ -390,6 +385,7 @@ def get_lines_lengths_on_pitch(
 
 
 def add_pitch_length_annotations(fig, pitch_coords, bowling_type='pace'):
+    """Adds pitch length text annotations to the figure."""
     length_coords = pitch_coords[
         (pitch_coords['point_description'] == 'length') & 
         ((pitch_coords['bowling_type'] == bowling_type) | (pitch_coords['bowling_type'].isna()))
@@ -417,6 +413,7 @@ def add_pitch_length_annotations(fig, pitch_coords, bowling_type='pace'):
 
 
 def add_pitch_side_annotations(fig, pitch_coords, batting_style='right_handed'):
+    """Adds off-side and leg-side side annotations based on batting style."""
     min_x = pitch_coords['x_coord'].min() if 'x_coord' in pitch_coords.columns else -2
     max_x = pitch_coords['x_coord'].max() if 'x_coord' in pitch_coords.columns else 2
     max_y = pitch_coords['y_coord'].max() if 'y_coord' in pitch_coords.columns else 22
@@ -455,6 +452,7 @@ def calculate_bowler_runs_by_direction(
         player_in_question = 'bowler',
         player_name = 'Shami'
     ):
+    """Calculates runs conceded or scored grouped by shot direction sectors."""
     if player_in_question == 'bowler':
         player_df = master_df[master_df['bowler'] == player_name].copy()
     else:
@@ -498,6 +496,7 @@ def calculate_bowler_runs_by_direction(
 
 
 def get_sector_color(pct):
+    """Returns color coding based on run share percentage."""
     if pct < 5:
         return "#D9F99D"
     elif pct < 10:
@@ -506,7 +505,7 @@ def get_sector_color(pct):
         return "#22C55E"
     else:
         return "#166534"
-    
+
 
 def plot_player_field_partitions_with_runs(
     ground_angles_df,
@@ -523,6 +522,7 @@ def plot_player_field_partitions_with_runs(
     outfield_color="#000000",
     pitch_color="#c9a777"
 ):
+    """Generates a field partition chart displaying run distribution across sectors."""
     if isinstance(batting_style, list) and len(batting_style) > 1:
         filter_value = 'right_handed'
     else:
@@ -680,7 +680,6 @@ def plot_player_field_partitions_with_runs(
     return ground_fig
 
 
-
 def get_plain_ground_and_pitch_figure(
     image_size=200,
     max_coord =363,
@@ -691,14 +690,12 @@ def get_plain_ground_and_pitch_figure(
     outfield_color="#2ca02c",
     pitch_color="#c9a777"
 ):
+    """Creates a base figure representing a cricket ground and pitch layout."""
     fig = go.Figure()
 
     center = (max_coord - min_coord)/ 2
-    # center = 181.5
 
-    # Boundary
-    radius = 2* center
-    # radius = image_size 
+    radius = 2 * center
 
     theta = np.linspace(0, 2 * np.pi, 300)
 
@@ -718,7 +715,6 @@ def get_plain_ground_and_pitch_figure(
         name='Boundary Rope'
     ))
 
-    # Pitch
     fig.add_shape(
         type="rect",
         x0=center - pitch_x_half,
@@ -738,12 +734,9 @@ def get_plain_ground_and_pitch_figure(
         showlegend=False,
 
         xaxis=dict(
-            # range=[0, image_size],
             showgrid=False,
             zeroline=False,
             visible=False,
-            # scaleratio=0.5,
-            # scaleanchor="x",
             fixedrange=True
         ),
 
@@ -768,8 +761,6 @@ def get_plain_ground_and_pitch_figure(
     return fig
 
 
-
-
 def plot_player_wagon_wheel(
     master_df,
     player_name,
@@ -781,7 +772,7 @@ def plot_player_wagon_wheel(
     outfield_color="#2ca02c",
     pitch_color="#c9a777"
 ):
-
+    """Generates a wagon wheel scatter plot for a selected batsman or bowler."""
     if player_in_question == 'bowler':
         player_df = master_df[
             master_df['bowl'] == player_name
@@ -796,7 +787,6 @@ def plot_player_wagon_wheel(
             f"No delivery data found for {player_in_question}: {player_name}"
         )
 
-    # Valid wagon-wheel coordinates
     player_df['wagonx'] = pd.to_numeric(
         player_df['wagonx'],
         errors='coerce'
@@ -811,7 +801,6 @@ def plot_player_wagon_wheel(
         subset=['wagonx', 'wagony']
     )
 
-    # Create figure using the SAME pixel coordinate system
     fig = get_plain_ground_and_pitch_figure(
         image_size=image_size,
         display_size=display_size,
@@ -821,7 +810,6 @@ def plot_player_wagon_wheel(
         pitch_color=pitch_color
     )
 
-    # Plot wagon-wheel coordinates directly
     fig.add_trace(go.Scatter(
         x=player_df['wagonx'],
         y=player_df['wagony'],
@@ -846,9 +834,7 @@ def plot_player_wagon_wheel(
         ),
 
         customdata=player_df[
-            ['batruns', 'shot', 
-            #  'direction'
-             ]
+            ['batruns', 'shot']
         ].values,
 
         name='Shots'
@@ -857,12 +843,11 @@ def plot_player_wagon_wheel(
     return fig
 
 
-
-
 def get_batting_profile(
     master_df: pd.DataFrame,
     group_cols: list[str],
 ) -> pd.DataFrame:
+    """Computes comprehensive batting statistics grouped by specified columns."""
     batting_df = (
         master_df.groupby(group_cols)
         .agg(
@@ -871,8 +856,6 @@ def get_batting_profile(
             dismissals=("out", "sum"),
             fours=("4s", "sum"),
             sixes=("6s", "sum"),
-            # half_centuries=("striker_50_counter", "sum"),
-            # centuries=("striker_100_counter", "sum"),
             boundaries=("boundaries", "sum"),
             dots=("batruns", lambda x: (x == 0).sum()),
             singles=("batruns", lambda x: (x == 1).sum()),
@@ -892,7 +875,6 @@ def get_batting_profile(
         .reset_index()
     )
 
-    # batting_df['half_centuries'] = batting_df['half_centuries'] - batting_df['centuries']
     batting_df["dot_ball_pct"] = (batting_df["dots"] * 100 / batting_df["balls"]).round(2)
     batting_df["run_rate"] = (batting_df["runs"] * 6 / batting_df["balls"]).round(2)
     batting_df["bat_overall_sr"] = (batting_df["runs"] * 100 / batting_df["balls"]).round(2)
@@ -915,6 +897,7 @@ def get_bowling_profile(
     master_df: pd.DataFrame,
     group_cols: list[str],
 ) -> pd.DataFrame:
+    """Computes comprehensive bowling statistics grouped by specified columns."""
     bowling_df = (
         master_df.groupby(group_cols)
         .agg(
@@ -926,8 +909,6 @@ def get_bowling_profile(
             caught_dismissals = ('batsman_caught_counter', 'sum'),
             lbw_dismissals = ('batsman_leg_before_wicket_counter', 'sum'),
             stumped_dismissals = ('batsman_stumped_counter', 'sum'),
-            # round_the_wicket = ('round_the_wicket_counter', 'sum'),
-            # extras = ('extras_conceded', 'sum'),
             batsman_not_in_control_balls = ('false_shot', 'sum'),
             boundaries=('boundaries', 'sum'),
             fours = ('4s', 'sum'),
@@ -950,6 +931,7 @@ def get_bowling_profile(
 
 
 def get_pairs(x):
+    """Generates unique pairs of items from an input list or iterable."""
     players = sorted(set(x))
     if len(players) < 2:
         return [(players[0], None)]
@@ -965,52 +947,32 @@ def get_batter_pca_impact(
         df_batting,
         feature_cols
     ):
-    """
-    Computes a PCA-based Batter Impact Score from core performance features.
-        
-    Expected input DataFrame columns (example):
-    - 'batsman_name'
-    - 'season_strike_rate'
-    - 'team_run_rate_diff'
-    - 'team_run_share'
-    - 'boundary_percentage'
-    - 'dot_percentage'
-    """
+    """Computes a PCA-based Batter Impact Score from core performance features."""
     df = df_batting.copy()
     
-    # Define features for PCA
     df = df[df['balls'] > 18].reset_index(drop = True)
 
-    # Handle missing values if any
     df[feature_cols] = df[feature_cols].fillna(df[feature_cols].median())
     
-    # Note: Dot percentage is inverse-impact (higher dot % is worse). 
-    # Multiply by -1 so that positive alignment matches positive impact.
-    # df['dot_ball_pct'] = df['dot_ball_pct'] * -1
     pca_features = feature_cols.copy()
     
-    # 1. Standardize features (mean=0, variance=1)
     scaler = StandardScaler()
     scaled_data = scaler.fit_transform(df[pca_features])
     
-    # 2. Fit PCA (Extracting Principal Component 1 and 2)
     pca = PCA(n_components=2)
     pca_result = pca.fit_transform(scaled_data)
     
     df['PC1'] = pca_result[:, 0]
     df['PC2'] = pca_result[:, 1]
     
-    # 3. Compute Composite Impact Score weighted by explained variance ratio
     explained_variance = pca.explained_variance_ratio_
     df['impact_score'] = (
         (df['PC1'] * explained_variance[0]) + 
         (df['PC2'] * explained_variance[1])
     ) / sum(explained_variance)
     
-    # Optional: Min-Max scale or Z-score the final impact score for cleaner presentation
     df['impact_score'] = (df['impact_score'] - df['impact_score'].mean()) / df['impact_score'].std()
     
-    # Sort by impact score descending
     df = df.sort_values(by='impact_score', ascending=False).reset_index(drop=True)
     
     print(f"PCA Explained Variance Ratio: PC1 = {explained_variance[0]:.2f}, PC2 = {explained_variance[1]:.2f}")
@@ -1018,11 +980,9 @@ def get_batter_pca_impact(
     return df
 
 
-
 def plot_single_metric_heatmap(
     df, 
     metric_name, 
-    # metric_title,
     role_in_question='batsman',
     title_text='', 
     group_cols = ['line', 'length'],
@@ -1030,13 +990,10 @@ def plot_single_metric_heatmap(
     line_order = ['far outside off', 'outside off', 'stumps', 'on leg', 'outside leg'],
     colorscale='YlOrRd',
     MAX_THRESHOLD = 250,
-    metric_title = ''
+    metric_title = '',
+    balls_col_candidates = ['balls', 'ball', 'deliveries']
 ):
-    """
-    Generates an individual heatmap for a specific metric:
-    Line on X-axis, Length on Y-axis, Metric Value as color fill.
-    """
-    # metrics_df = calculate_matrix_metrics(df)
+    """Generates an individual metric heatmap with pitch lines and lengths."""
     if role_in_question == 'batsman':
         metrics_df = get_batting_profile(
             df,
@@ -1048,43 +1005,63 @@ def plot_single_metric_heatmap(
             group_cols=group_cols
         )
         
-    # Pivot data so X=Line, Y=Length, Values=Selected Metric
     pivot_df = metrics_df.pivot(index='length', columns='line', values=metric_name)
 
-    # Custom ordering for cricket lengths/lines if standard names exist
-    
-    
-    existing_lengths = [l for l in length_order if l in pivot_df.index] + [l for l in pivot_df.index if l not in length_order]
-    existing_lines = [c for c in line_order if c in pivot_df.columns] + [c for c in pivot_df.columns if c not in line_order]
-    
-    pivot_df.columns = pivot_df.columns.get_level_values(1)
-    pivot_df.columns = [x.replace("_", " ").title() for x in pivot_df.columns]
-    pivot_df.index = [x.replace("_", " ").title() for x in pivot_df.index]
-    
-    pivot_df = pivot_df.reindex(
-        index=[l.replace("_", " ").title() for l in length_order], 
-        columns=[l.replace("_", " ").title() for l in line_order]
-        )
+    balls_pivot = None
+    actual_balls_col = next((col for col in balls_col_candidates if col in metrics_df.columns), None)
+    if actual_balls_col:
+        balls_pivot = metrics_df.pivot(index='length', columns='line', values=actual_balls_col)
 
-    # st.dataframe(metrics_df)
+    if isinstance(pivot_df.columns, pd.MultiIndex):
+        pivot_df.columns = pivot_df.columns.get_level_values(1)
+        if balls_pivot is not None and isinstance(balls_pivot.columns, pd.MultiIndex):
+            balls_pivot.columns = balls_pivot.columns.get_level_values(1)
+
+    pivot_df.columns = [str(x).replace("_", " ").title() for x in pivot_df.columns]
+    pivot_df.index = [str(x).replace("_", " ").title() for x in pivot_df.index]
+    
+    reindexed_lengths = [l.replace("_", " ").title() for l in length_order]
+    reindexed_lines = [l.replace("_", " ").title() for l in line_order]
+
+    pivot_df = pivot_df.reindex(index=reindexed_lengths, columns=reindexed_lines)
+    
+    if balls_pivot is not None:
+        balls_pivot.columns = [str(x).replace("_", " ").title() for x in balls_pivot.columns]
+        balls_pivot.index = [str(x).replace("_", " ").title() for x in balls_pivot.index]
+        balls_pivot = balls_pivot.reindex(index=reindexed_lengths, columns=reindexed_lines)
+
+    text_matrix = []
+    for r_idx, row_label in enumerate(pivot_df.index):
+        row_texts = []
+        for c_idx, col_label in enumerate(pivot_df.columns):
+            val = pivot_df.iloc[r_idx, c_idx]
+            if pd.isna(val):
+                row_texts.append("")
+            else:
+                formatted_val = f"{val:.2f}" if isinstance(val, (int, float)) else str(val)
+                if balls_pivot is not None:
+                    b_val = balls_pivot.iloc[r_idx, c_idx]
+                    if not pd.isna(b_val):
+                        row_texts.append(f"{formatted_val}<br>({int(b_val)})")
+                    else:
+                        row_texts.append(formatted_val)
+                else:
+                    row_texts.append(formatted_val)
+        text_matrix.append(row_texts)
 
     fig = go.Figure(
         data=go.Heatmap(
             z=pivot_df.values,
-            # x=[c.title() for c in pivot_df.columns],
-            x= pivot_df.columns,
-            # y=[r.title() for r in pivot_df.index],
+            x=pivot_df.columns,
             y=pivot_df.index,
-            # text=pivot_df.values.round(2),
-            text = pivot_df.map(lambda x: "" if pd.isna(x) else x),
+            text=text_matrix,
             texttemplate="%{text}",
             textfont=dict(
-                size=12,
-                
+                size=11,
                 color="black"
             ),
             colorscale=colorscale,
-            zmin = 0,
+            zmin=0,
             zmax=MAX_THRESHOLD,
             zsmooth='best',
             hovertemplate="Line: %{x}<br>Length: %{y}<br>" + f"{metric_name}: %{{z}}<extra></extra>"
@@ -1109,68 +1086,11 @@ def plot_single_metric_heatmap(
         yaxis=dict(
             type='category', 
             showgrid=False,
-            # autoreselect=False, 
             autorange="reversed"
         )
     )
 
     return fig
-
-
-
-def plot_batsman_pitch_heatmap(
-    bat_df, 
-    pitch_coords, 
-    batsman_name, 
-    bowling_type='pace', 
-    batting_style='',
-    group_by='line',
-    facet=False,
-    title_text=''
-):
-    df = bat_df.copy()
-
-    if 'line' in df.columns:
-        df['line'] = df['line'].astype(str).str.strip().str.lower()
-    if 'length' in df.columns:
-        df['length'] = df['length'].astype(str).str.strip().str.lower()
-
-    if 'bowling_type' in df.columns:
-        df = df[df['bowling_type'] == bowling_type].reset_index(drop=True)
-
-    if 'boundaries' not in df.columns:
-        df['boundaries'] = df['batruns'].apply(lambda x: 1 if x in [4, 6] else 0)
-
-    title = title_text or f"Batting Metrics for {batsman_name} vs {bowling_type.title()}"
-    return build_grouped_bar_figure(df, group_by=group_by, facet=facet, title_text=title)
-
-
-def plot_bowler_pitch_heatmap(
-    bowl_df, 
-    pitch_coords, 
-    bowler_name, 
-    bowling_type='pace',
-    batting_style='right_handed',
-    group_by='line',
-    facet=False,
-    title_text=''
-):
-    df = bowl_df.copy()
-
-    if 'line' in df.columns:
-        df['line'] = df['line'].astype(str).str.strip().str.lower()
-    if 'length' in df.columns:
-        df['length'] = df['length'].astype(str).str.strip().str.lower()
-
-    if 'batting_style' in df.columns and batting_style:
-        df = df[df['batting_style'] == batting_style].reset_index(drop=True)
-
-    if 'boundaries' not in df.columns:
-        df['boundaries'] = df['batruns'].apply(lambda x: 1 if x in [4, 6] else 0)
-
-    title = title_text or f"Bowling Metrics for {bowler_name} vs {batting_style.replace('_', ' ').title()}"
-    return build_grouped_bar_figure(df, group_by=group_by, facet=facet, title_text=title)
-
 
 
 def plot_team_run_rate_comparison(
@@ -1183,6 +1103,7 @@ def plot_team_run_rate_comparison(
     innings: list[int] = None,
     title: str = "Mean Current Run Rate Maintained at End of Each Over",
 ):
+    """Plots a line chart comparing team run rates across overs."""
     filtered_df = df.copy()
 
     if innings:
@@ -1214,7 +1135,6 @@ def plot_team_run_rate_comparison(
         layer="below"
     )
 
-    # Middle overs
     fig.add_vrect(
         x0=6, x1=15,
         fillcolor="lightgrey",
@@ -1223,7 +1143,6 @@ def plot_team_run_rate_comparison(
         layer="below"
     )
 
-    # Death overs
     fig.add_vrect(
         x0=15, x1=20,
         fillcolor="lightgrey",
@@ -1232,7 +1151,6 @@ def plot_team_run_rate_comparison(
         layer="below"
     )
 
-    # Labels at the top of each region
     for x, label in [(3, "POWERPLAY"), (10.5, "MIDDLE"), (17.5, "DEATH")]:
         fig.add_annotation(
             x=x,
@@ -1257,17 +1175,14 @@ def plot_team_run_rate_comparison(
     fig.update_layout(
         xaxis_title="Overs",
         yaxis_title="Current Run Rate",
-        # hovermode= False,
-        showlegend=False        ,
+        showlegend=False,
         margin=dict(l=10, r=10, t=40, b=10),
         legend_title_text="Batting Team",        
         xaxis=dict(
-            # range=[image_size, -200],
             showgrid=False
         ),
         yaxis=dict(
             showgrid=False,
-            # range=[4.5, 11.5],
         )
     )
 
@@ -1283,6 +1198,7 @@ def plot_partnership_runs(
     secondary_color = '',
     title: str = "Partnership Runs by Wicket"
 ):
+    """Plots a bar chart showing partnership runs grouped by wicket order."""
     filtered_df = df.copy()
 
     if selected_team:
@@ -1340,7 +1256,8 @@ def plot_false_shots_by_over(
     color_map = {},
     bar_color: str = "#1F77B4",
     title: str = "False Shots Induced by Over (Runs Scored Included)"
-) :
+):
+    """Plots a horizontal bar chart of false shot percentages induced by over."""
     filtered_df = df.copy()
 
     if innings and 'inns' in filtered_df.columns:
@@ -1350,7 +1267,6 @@ def plot_false_shots_by_over(
 
     if 'inns' in filtered_df.columns and len(filtered_df['inns'].unique()) > 1:
         group_cols.append('inns')
-
 
     false_shot_df = filtered_df.groupby(group_cols, as_index=False).agg(
         false_shot_num=('false_shot', 'sum'),
@@ -1383,7 +1299,7 @@ def plot_false_shots_by_over(
 
     fig.update_layout(
         yaxis_title="Over Number",
-        xaxis_title="False Shots Induced",
+        xaxis_title="False Shot % Induced",
         hovermode=False,
         plot_bgcolor=secondary_color,
         paper_bgcolor=secondary_color,
@@ -1406,6 +1322,7 @@ def plot_economy_rate_comparison(
     innings: list[int] = [],
     title: str = "Over-wise Economy Rate Comparison Across Teams"
 ):
+    """Plots a comparison line chart for bowling metrics across overs for teams."""
     filtered_df = df.copy()
     team_col = 'team_bowl' 
 
@@ -1419,7 +1336,6 @@ def plot_economy_rate_comparison(
         filtered_df,
         [team_col, 'over_num']
     )
-    
 
     label_to_col_dict = {
         'Bowling Average' : 'bowl_overall_avg',
@@ -1444,49 +1360,8 @@ def plot_economy_rate_comparison(
         markers=True,
         title=title
     )
-    
-    # fig.add_vrect(
-    #     x0=0, x1=6,
-    #     fillcolor="lightgrey",
-    #     opacity=0.06,
-    #     line_width=0,
-    #     layer="below"
-    # )
-
-    # # Middle overs
-    # fig.add_vrect(
-    #     x0=6, x1=15,
-    #     fillcolor="lightgrey",
-    #     opacity=0.03,
-    #     line_width=0,
-    #     layer="below"
-    # )
-
-    # # Death overs
-    # fig.add_vrect(
-    #     x0=15, x1=20,
-    #     fillcolor="lightgrey",
-    #     opacity=0,
-    #     line_width=0,
-    #     layer="below"
-    # )
-
-    # # Labels at the top of each region
-    # for x, label in [(3, "POWERPLAY"), (10.5, "MIDDLE"), (17.5, "DEATH")]:
-    #     fig.add_annotation(
-    #         x=x,
-    #         y=0.98,
-    #         yref="paper",
-    #         text=label,
-    #         showarrow=False,
-    #         font=dict(size=11),
-    #         xanchor="center"
-    #     )
 
     for trace in fig.data:
-        # trace.hoverinfo = 'skip'
-        # trace.hovertemplate = None
-
         if trace.name == selected_team:
             trace.line.width = 4
             trace.marker.size = 8
@@ -1499,7 +1374,6 @@ def plot_economy_rate_comparison(
     fig.update_layout(
         xaxis_title="Over Number",
         yaxis_title=metric,
-        # hovermode=False,
         showlegend=False,
         legend_title_text="Team",
         margin=dict(l=10, r=10, t=40, b=10),
@@ -1508,8 +1382,7 @@ def plot_economy_rate_comparison(
     )
 
     return fig
-import plotly.express as px
-import numpy as np
+
 
 def plot_raa_vs_dismissal_rate(
     filtered_df,
@@ -1520,14 +1393,9 @@ def plot_raa_vs_dismissal_rate(
     text_color: str = "#1A1A1A",
     text_bg_color: str = "rgba(255, 255, 255, 0.85)"
 ):
-    """
-    Generates a Plotly scatter chart comparing RAA per 100 balls vs Impact Score 
-    for batsmen who have faced at least 50 balls, with smart non-overlapping text labels.
-    """
-    # Create copy to avoid SettingWithCopyWarning
+    """Generates a scatter chart comparing RAA per 100 balls vs Impact Score with smart non-overlapping text labels."""
     df = filtered_df.copy()
 
-    # Assign team legend category
     df['Legend'] = df['team_bat'].apply(
         lambda team: team if team == chosen_team else 'Other Teams'
     )
@@ -1556,40 +1424,32 @@ def plot_raa_vs_dismissal_rate(
         }
     )
 
-    # Marker styling
     fig.update_traces(
         marker=dict(size=8, line=dict(width=1, color='DarkSlateGrey'))
     )
 
-    # Predefined array of smart offset positions to cycle through if points are crowded
     offset_options = [
-        {'xanchor': 'left',  'yanchor': 'bottom', 'xshift': 12,  'yshift': 8},   # Top-Right
-        {'xanchor': 'right', 'yanchor': 'bottom', 'xshift': -12, 'yshift': 8},   # Top-Left
-        {'xanchor': 'left',  'yanchor': 'top',    'xshift': 12,  'yshift': -8},  # Bottom-Right
-        {'xanchor': 'right', 'yanchor': 'top',    'xshift': -12, 'yshift': -8},  # Bottom-Left
-        {'xanchor': 'right', 'yanchor': 'middle', 'xshift': -15, 'yshift': 0},   # Middle-Left
-        {'xanchor': 'left',  'yanchor': 'middle', 'xshift': 15,  'yshift': 0}    # Middle-Right
+        {'xanchor': 'left',  'yanchor': 'bottom', 'xshift': 12,  'yshift': 8},   
+        {'xanchor': 'right', 'yanchor': 'bottom', 'xshift': -12, 'yshift': 8},   
+        {'xanchor': 'left',  'yanchor': 'top',    'xshift': 12,  'yshift': -8},  
+        {'xanchor': 'right', 'yanchor': 'top',    'xshift': -12, 'yshift': -8},  
+        {'xanchor': 'right', 'yanchor': 'middle', 'xshift': -15, 'yshift': 0},   
+        {'xanchor': 'left',  'yanchor': 'middle', 'xshift': 15,  'yshift': 0}    
     ]
 
-    # Smart placement logic for chosen team annotations
     chosen_team_df = df[df['team_bat'] == chosen_team].reset_index(drop=True)
     
-    # Track placed coordinates to resolve minor local overlaps
     placed_coords = []
 
     for idx, row in chosen_team_df.iterrows():
         x_val = row['raa_per_100_balls']
         y_val = row['impact_score']
         
-        # Determine best initial offset based on index or local crowding
-        # We cycle through offset options to naturally spread nearby points apart
         chosen_offset = offset_options[idx % len(offset_options)]
 
-        # If another point is very close, try alternative offsets to find empty space
         for coord in placed_coords:
             dist = np.sqrt((x_val - coord['x'])**2 + (y_val - coord['y'])**2)
-            if dist < 5:  # Threshold for local crowding
-                # Shift offset index to try a different quadrant
+            if dist < 5:
                 chosen_offset = offset_options[(idx + 2) % len(offset_options)]
                 break
 
@@ -1615,7 +1475,6 @@ def plot_raa_vs_dismissal_rate(
             opacity=0.95
         )
 
-    # Layout styling
     fig.update_layout(
         title=dict(
             text=title,
