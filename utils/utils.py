@@ -231,8 +231,17 @@ def get_points_table(master_df):
     table['position'] = table.groupby('year').cumcount() + 1
 
     return (
-        table.rename(columns={'year': 'season'})
-        [['season', 'position', 'team',  'wins', 'losses', 'NR', 'NRR']]
+        table[['season', 'position', 'team',  'wins', 'losses', 'NR', 'NRR']].rename(
+            columns={
+                'year': 'Season',
+                'position' : "Position",
+                'team' : 'Team',
+                'wins' : 'Wins',
+                'losses' : "Losses",
+                'NR' : "No-Result",
+                'NRR' : 'Net-Run-Rate'
+            }
+        )
         .reset_index(drop=True)
     )
 
