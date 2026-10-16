@@ -51,7 +51,7 @@ def build_points_table(
         ].reset_index(drop =True)
     
     def highlight_team(row):
-        if row['team'] == selected_team:
+        if row['Team'] == selected_team:
             return [
                 f"background-color: {secondary_color}33"
             ] * len(row)
