@@ -48,7 +48,7 @@ def build_points_table(
 
     points_table = points_table.loc[
             points_table['Season'].isin([season_selector])
-        ].reset_index(drop =True)
+        ].reset_index(drop =True).drop(columns = ['Season'])
     
     def highlight_team(row):
         if row['Team'] == selected_team:
