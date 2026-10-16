@@ -231,7 +231,7 @@ def get_points_table(master_df):
     table['position'] = table.groupby('year').cumcount() + 1
 
     return (
-        table[['season', 'position', 'team',  'wins', 'losses', 'NR', 'NRR']].rename(
+        table[['year', 'position', 'team',  'wins', 'losses', 'NR', 'NRR']].rename(
             columns={
                 'year': 'Season',
                 'position' : "Position",
